@@ -14,10 +14,10 @@ pragma solidity ^0.8.0;
 //      ▐░▌     ▐░▌       ▐░▌▐░░░░░░░░░░░▌     ▐░▌      ▐░░▌▐░▌       ▐░▌▐░░░░░░░░░░░▌▐░▌       ▐░▌
 //       ▀       ▀         ▀  ▀▀▀▀▀▀▀▀▀▀▀       ▀        ▀▀  ▀         ▀  ▀▀▀▀▀▀▀▀▀▀▀  ▀         ▀
 
-import "@openzeppelin/contracts/utils/Counters.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-// import "@openzeppelin/contracts/lifecycle/Pausable.sol";
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+
+
+// import "./contracts/lifecycle/Pausable.sol";
+
 
 
 // mint id 0 at 10bnb
@@ -257,3 +257,6 @@ contract THC_NAZA is ERC721, Ownable {
 // constructor() ERC1155("https://gateway.pinata.cloud/ipfs/QmS7vBvBqbdcUm3zx3cwkUc9hiFp4eqSW7xGoB5Wv6dzzj/THC_NAZA_={id}.json") {
 //     _mint(msg.sender, 1, 100, "" );
 // }
+
+
+
