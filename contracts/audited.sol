@@ -1064,10 +1064,10 @@ contract THCNAZA is ERC721, Ownable, Pausable {
         require(!_exists(0), "Genesis has been minted. Stay tuned for our next THC drop!");
         require(PRICE_GENESIS < msg.value, "Ether value sent is not correct");
         //Minting the NFT and binding token URI
-        ++numMinted;
-        _setTokenURI(0,"0");
         _safeMint(msg.sender, 0);
+        _setTokenURI(0,"0");
         //Incrementing minted tokens count
+        ++numMinted;
     }
 
 
@@ -1083,10 +1083,10 @@ contract THCNAZA is ERC721, Ownable, Pausable {
         uint256 tokenId = _rareTokenIdentifiers.current();
         require(!_exists(tokenId), "That token ID has already been minted. Please try again.");
         //Minting the NFT and binding token URI
-        ++numMinted;
-        _setTokenURI(tokenId, uintToString(tokenId));
         _safeMint(msg.sender, tokenId);
+        _setTokenURI(tokenId, uintToString(tokenId));
         //Incrementing minted tokens count
+        ++numMinted;
     }
 
 
@@ -1100,10 +1100,10 @@ contract THCNAZA is ERC721, Ownable, Pausable {
         _standardTokenIdentifiers.increment();
         uint256 tokenId = _standardTokenIdentifiers.current();
         //Minting the NFT and binding token URI
-        ++numMinted;
-        _setTokenURI(tokenId, uintToString(tokenId));
         _safeMint(msg.sender, tokenId);
+        _setTokenURI(tokenId, uintToString(tokenId));
         //Incrementing minted tokens count
+        ++numMinted;
     }
 
 
