@@ -1,3 +1,4 @@
+
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
@@ -961,10 +962,6 @@ abstract contract Pausable is Context {
     }
 }
 
-// mint id 0 at 10bnb
-// mint id 1-500 at 0.3 bnb
-//NOTE: In remix, send wei, 0.4 BNB = 400000000000000000
-
 
 /**
  * @title TranshumanCoinNAZA
@@ -980,21 +977,14 @@ contract THCNAZA is ERC721, Ownable, Pausable {
     //THC_NAZA Total supply is 501
     uint256 public constant TOTAL_SUPPLY = 501;
 
-    // //Prices
-    // //0.25 BNB
-    // uint256 immutable PRICE_STANDARD = 250000000000000000;
-    // //0.5 BNB
-    // uint256 immutable PRICE_RARE = 500000000000000000;
-    // //10 BNB
-    // uint256 immutable PRICE_GENESIS = 10000000000000000000;
 
-        // //Prices
-    // //0.025 BNB
-    uint256 constant PRICE_STANDARD = 24e15;
-    // //0.05 BNB
-    uint256 constant PRICE_RARE = 49e15;
-    // //0.01 BNB
-    uint256 constant PRICE_GENESIS = 99e14;
+    //Prices
+    //0.25 BNB
+    uint256 constant PRICE_STANDARD = 24e16;
+    //0.5 BNB
+    uint256 constant PRICE_RARE = 49e16;
+    //10 BNB
+    uint256 constant PRICE_GENESIS = 99e17;
 
 
     //TokenId counters
@@ -1076,7 +1066,6 @@ contract THCNAZA is ERC721, Ownable, Pausable {
     * @dev Mints 1 Rare NFT for 0.5 BNB
     */
     function mintRareNFT() external payable whenNotPaused {
-        //Check that correct amount is sent and supply is available
         require(numMinted < TOTAL_SUPPLY, "Sale has already ended");
         require(PRICE_RARE < msg.value, "Ether value sent is not correct");
         // Incrementing ID to create new tokenn
@@ -1095,7 +1084,6 @@ contract THCNAZA is ERC721, Ownable, Pausable {
     * @dev Mints 1 Rare NFT for 0.25 BNB
     */
     function mintStandardNFT() external payable whenNotPaused {
-        //Check that correct amount is sent and supply is available
         require(numMinted < TOTAL_SUPPLY, "Sale has already ended");
         require(PRICE_STANDARD < msg.value, "Ether value sent is not correct");
         // Incrementing ID to create new tokenn
@@ -1141,7 +1129,6 @@ contract THCNAZA is ERC721, Ownable, Pausable {
     function withdraw() external onlyOwner {
         uint balance = address(this).balance;
         address payable ownerAddress = payable(msg.sender);
-        // require(0x0 != ownerAddress, "Bad address");
         require(ownerAddress != address(0), "ERC20: transfer to the zero address");
         ownerAddress.transfer(balance);
     }
@@ -1160,5 +1147,4 @@ contract THCNAZA is ERC721, Ownable, Pausable {
     function unpause() external virtual onlyOwner() {
         super._unpause();
     }
-// }
 }

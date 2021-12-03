@@ -1058,7 +1058,7 @@ contract THCNAZA is ERC721, Ownable, Pausable {
     /**
     * @dev Mints 1 Genesis NFT for 10BNB
     */
-    function mintGenesisNFT() external payable whenNotPaused {
+    function mintGenesis() external payable whenNotPaused {
         //Check that correct amount is sent and supply is available
         require(numMinted < TOTAL_SUPPLY, "Sale has already ended");
         require(!_exists(0), "Genesis has been minted. Stay tuned for our next THC drop!");
@@ -1094,7 +1094,7 @@ contract THCNAZA is ERC721, Ownable, Pausable {
     /**
     * @dev Mints 1 Rare NFT for 0.25 BNB
     */
-    function mintStandardNFT() external payable whenNotPaused {
+    function mintNFT() external payable whenNotPaused {
         //Check that correct amount is sent and supply is available
         require(numMinted < TOTAL_SUPPLY, "Sale has already ended");
         require(PRICE_STANDARD < msg.value, "Ether value sent is not correct");
