@@ -1,4 +1,3 @@
-
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
@@ -1049,14 +1048,11 @@ contract THCNAZA is ERC721, Ownable, Pausable {
     * @dev Mints 1 Genesis NFT for 10BNB
     */
     function mintGenesisNFT() external payable whenNotPaused {
-        //Check that correct amount is sent and supply is available
         require(numMinted < TOTAL_SUPPLY, "Sale has already ended");
         require(!_exists(0), "Genesis has been minted. Stay tuned for our next THC drop!");
         require(PRICE_GENESIS < msg.value, "Ether value sent is not correct");
-        //Minting the NFT and binding token URI
         _safeMint(msg.sender, 0);
         _setTokenURI(0,"0");
-        //Incrementing minted tokens count
         ++numMinted;
     }
 
@@ -1068,35 +1064,56 @@ contract THCNAZA is ERC721, Ownable, Pausable {
     function mintRareNFT() external payable whenNotPaused {
         require(numMinted < TOTAL_SUPPLY, "Sale has already ended");
         require(PRICE_RARE < msg.value, "Ether value sent is not correct");
-        // Incrementing ID to create new tokenn
         _rareTokenIdentifiers.increment();
         uint256 tokenId = _rareTokenIdentifiers.current();
         require(!_exists(tokenId), "That token ID has already been minted. Please try again.");
-        //Minting the NFT and binding token URI
         _safeMint(msg.sender, tokenId);
         _setTokenURI(tokenId, uintToString(tokenId));
-        //Incrementing minted tokens count
         ++numMinted;
     }
 
 
     /**
-    * @dev Mints 1 Rare NFT for 0.25 BNB
+    * @dev Mints 1 Standard NFT for 0.25 BNB
     */
     function mintStandardNFT() external payable whenNotPaused {
         require(numMinted < TOTAL_SUPPLY, "Sale has already ended");
         require(PRICE_STANDARD < msg.value, "Ether value sent is not correct");
-        // Incrementing ID to create new tokenn
         _standardTokenIdentifiers.increment();
         uint256 tokenId = _standardTokenIdentifiers.current();
-        //Minting the NFT and binding token URI
+        require(!_exists(tokenId), "That token ID has already been minted. Please try again.");
         _safeMint(msg.sender, tokenId);
         _setTokenURI(tokenId, uintToString(tokenId));
-        //Incrementing minted tokens count
         ++numMinted;
     }
 
 
+    /**
+    * @dev Mints 1 Standard NFT for free for team and promotional purposes
+    */
+    function mintFreeStandardNFT() external onlyOwner {
+        require(numMinted < TOTAL_SUPPLY, "Sale has already ended");
+        _standardTokenIdentifiers.increment();
+        uint256 tokenId = _standardTokenIdentifiers.current();
+        require(!_exists(tokenId), "That token ID has already been minted. Please try again.");
+        _safeMint(msg.sender, tokenId);
+        _setTokenURI(tokenId, uintToString(tokenId));
+        ++numMinted;
+    }
+
+
+    /**
+    * @dev Mints 1 Rare NFT for free for team and promotional purposes
+    */
+    function mintFreeRareNFT() external onlyOwner {
+        require(numMinted < TOTAL_SUPPLY, "Sale has already ended");
+        _rareTokenIdentifiers.increment();
+        uint256 tokenId = _rareTokenIdentifiers.current();
+        require(!_exists(tokenId), "That token ID has already been minted. Please try again.");
+        _safeMint(msg.sender, tokenId);
+        _setTokenURI(tokenId, uintToString(tokenId));
+        ++numMinted;
+    }
 
 
     function uintToString(uint i) internal pure returns (string memory _uintAsString) {
