@@ -973,9 +973,9 @@ contract THCNAZA is ERC721, Ownable, Pausable {
 
     //Tracks numTokens minted
     uint256 public numMinted = 0;
-    //Tracks numstandard minted max 400 can be minted
+    //Tracks numStandard minted
     uint256 public numStandardMinted = 0;
-    //Tracks numRare minted max 100 can be minted
+    //Tracks numRare minted
     uint256 public numRareMinted = 0;
 
 
