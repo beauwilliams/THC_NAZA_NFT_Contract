@@ -973,13 +973,12 @@ contract THCNAZA is ERC721, Ownable, Pausable {
 
     //Tracks numTokens minted
     uint256 public numMinted = 0;
-    //Tracks numStandard minted
+    //Tracks numstandard minted max 400 can be minted
     uint256 public numStandardMinted = 0;
-    //Tracks numRare minted
+    //Tracks numRare minted max 100 can be minted
     uint256 public numRareMinted = 0;
 
 
-    //SUPPLY
     //THC_NAZA Total supply is 501
     uint256 public constant TOTAL_SUPPLY = 501;
     //THC_NAZA Rare supply is 100
@@ -1066,9 +1065,9 @@ contract THCNAZA is ERC721, Ownable, Pausable {
         require(numMinted < TOTAL_SUPPLY, "Sale has already ended");
         require(!_exists(0), "Genesis has been minted. Stay tuned for our next THC drop!");
         require(PRICE_GENESIS < msg.value, "Ether value sent is not correct");
+        ++numMinted;
         _safeMint(msg.sender, 0);
         _setTokenURI(0,"0");
-        ++numMinted;
     }
 
 
@@ -1083,10 +1082,10 @@ contract THCNAZA is ERC721, Ownable, Pausable {
         _rareTokenIdentifiers.increment();
         uint256 tokenId = _rareTokenIdentifiers.current();
         require(!_exists(tokenId), "That token ID has already been minted. Please try again.");
-        _safeMint(msg.sender, tokenId);
-        _setTokenURI(tokenId, uintToString(tokenId));
         ++numMinted;
         ++numRareMinted;
+        _safeMint(msg.sender, tokenId);
+        _setTokenURI(tokenId, uintToString(tokenId));
     }
 
 
@@ -1100,10 +1099,10 @@ contract THCNAZA is ERC721, Ownable, Pausable {
         _standardTokenIdentifiers.increment();
         uint256 tokenId = _standardTokenIdentifiers.current();
         require(!_exists(tokenId), "That token ID has already been minted. Please try again.");
-        _safeMint(msg.sender, tokenId);
-        _setTokenURI(tokenId, uintToString(tokenId));
         ++numMinted;
         ++numStandardMinted;
+        _safeMint(msg.sender, tokenId);
+        _setTokenURI(tokenId, uintToString(tokenId));
     }
 
 
@@ -1113,9 +1112,9 @@ contract THCNAZA is ERC721, Ownable, Pausable {
     function mintFreeGenesisNFT() external onlyOwner {
         require(numMinted < TOTAL_SUPPLY, "Sale has already ended");
         require(!_exists(0), "Genesis has been minted. Stay tuned for our next THC drop!");
+        ++numMinted;
         _safeMint(msg.sender, 0);
         _setTokenURI(0,"0");
-        ++numMinted;
     }
 
 
@@ -1128,10 +1127,10 @@ contract THCNAZA is ERC721, Ownable, Pausable {
         _standardTokenIdentifiers.increment();
         uint256 tokenId = _standardTokenIdentifiers.current();
         require(!_exists(tokenId), "That token ID has already been minted. Please try again.");
-        _safeMint(msg.sender, tokenId);
-        _setTokenURI(tokenId, uintToString(tokenId));
         ++numMinted;
         ++numStandardMinted;
+        _safeMint(msg.sender, tokenId);
+        _setTokenURI(tokenId, uintToString(tokenId));
     }
 
 
@@ -1144,10 +1143,10 @@ contract THCNAZA is ERC721, Ownable, Pausable {
         _rareTokenIdentifiers.increment();
         uint256 tokenId = _rareTokenIdentifiers.current();
         require(!_exists(tokenId), "That token ID has already been minted. Please try again.");
-        _safeMint(msg.sender, tokenId);
-        _setTokenURI(tokenId, uintToString(tokenId));
         ++numMinted;
         ++numRareMinted;
+        _safeMint(msg.sender, tokenId);
+        _setTokenURI(tokenId, uintToString(tokenId));
     }
 
 
