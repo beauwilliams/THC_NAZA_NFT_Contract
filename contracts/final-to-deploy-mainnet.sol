@@ -970,11 +970,22 @@ abstract contract Pausable is Context {
 
 contract THCNAZA is ERC721, Ownable, Pausable {
 
+
     //Tracks numTokens minted
     uint256 public numMinted = 0;
+    //Tracks numStandard minted
+    uint256 public numStandardMinted = 0;
+    //Tracks numRare minted
+    uint256 public numRareMinted = 0;
 
+
+    //SUPPLY
     //THC_NAZA Total supply is 501
     uint256 public constant TOTAL_SUPPLY = 501;
+    //THC_NAZA Rare supply is 100
+    uint256 public constant TOTAL_RARE = 100;
+    //THC_NAZA Standard supply is 400
+    uint256 public constant TOTAL_STANDARD = 400;
 
 
     //Prices
@@ -990,6 +1001,7 @@ contract THCNAZA is ERC721, Ownable, Pausable {
     using Counters for Counters.Counter;
     Counters.Counter private _rareTokenIdentifiers;
     Counters.Counter private _standardTokenIdentifiers;
+
 
     // Optional mapping for token URIs
     mapping (uint256 => string) private _tokenURIs;
@@ -1014,14 +1026,17 @@ contract THCNAZA is ERC721, Ownable, Pausable {
         _baseURIextended = baseURI_;
     }
 
+
     function _setTokenURI(uint256 tokenId, string memory _tokenURI) internal virtual {
         require(_exists(tokenId), "ERC721Metadata: URI set of nonexistent token");
         _tokenURIs[tokenId] = _tokenURI;
     }
 
+
     function _baseURI() internal view virtual override returns (string memory) {
         return _baseURIextended;
     }
+
 
     function tokenURI(uint256 tokenId) external view virtual override returns (string memory) {
         require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
@@ -1063,6 +1078,7 @@ contract THCNAZA is ERC721, Ownable, Pausable {
     */
     function mintRareNFT() external payable whenNotPaused {
         require(numMinted < TOTAL_SUPPLY, "Sale has already ended");
+        require(numRareMinted < TOTAL_RARE, "Rare sold NFTs sold out");
         require(PRICE_RARE < msg.value, "Ether value sent is not correct");
         _rareTokenIdentifiers.increment();
         uint256 tokenId = _rareTokenIdentifiers.current();
@@ -1070,6 +1086,7 @@ contract THCNAZA is ERC721, Ownable, Pausable {
         _safeMint(msg.sender, tokenId);
         _setTokenURI(tokenId, uintToString(tokenId));
         ++numMinted;
+        ++numRareMinted;
     }
 
 
@@ -1078,12 +1095,26 @@ contract THCNAZA is ERC721, Ownable, Pausable {
     */
     function mintStandardNFT() external payable whenNotPaused {
         require(numMinted < TOTAL_SUPPLY, "Sale has already ended");
+        require(numStandardMinted < TOTAL_STANDARD, "Standard NFTs sold out");
         require(PRICE_STANDARD < msg.value, "Ether value sent is not correct");
         _standardTokenIdentifiers.increment();
         uint256 tokenId = _standardTokenIdentifiers.current();
         require(!_exists(tokenId), "That token ID has already been minted. Please try again.");
         _safeMint(msg.sender, tokenId);
         _setTokenURI(tokenId, uintToString(tokenId));
+        ++numMinted;
+        ++numStandardMinted;
+    }
+
+
+    /**
+    * @dev Mints 1 Genesis NFT for free for team and promotional purposes
+    */
+    function mintFreeGenesisNFT() external onlyOwner {
+        require(numMinted < TOTAL_SUPPLY, "Sale has already ended");
+        require(!_exists(0), "Genesis has been minted. Stay tuned for our next THC drop!");
+        _safeMint(msg.sender, 0);
+        _setTokenURI(0,"0");
         ++numMinted;
     }
 
@@ -1093,12 +1124,14 @@ contract THCNAZA is ERC721, Ownable, Pausable {
     */
     function mintFreeStandardNFT() external onlyOwner {
         require(numMinted < TOTAL_SUPPLY, "Sale has already ended");
+        require(numStandardMinted < TOTAL_STANDARD, "Standard NFTs sold out");
         _standardTokenIdentifiers.increment();
         uint256 tokenId = _standardTokenIdentifiers.current();
         require(!_exists(tokenId), "That token ID has already been minted. Please try again.");
         _safeMint(msg.sender, tokenId);
         _setTokenURI(tokenId, uintToString(tokenId));
         ++numMinted;
+        ++numStandardMinted;
     }
 
 
@@ -1107,12 +1140,14 @@ contract THCNAZA is ERC721, Ownable, Pausable {
     */
     function mintFreeRareNFT() external onlyOwner {
         require(numMinted < TOTAL_SUPPLY, "Sale has already ended");
+        require(numRareMinted < TOTAL_RARE, "Rare NFTs sold out");
         _rareTokenIdentifiers.increment();
         uint256 tokenId = _rareTokenIdentifiers.current();
         require(!_exists(tokenId), "That token ID has already been minted. Please try again.");
         _safeMint(msg.sender, tokenId);
         _setTokenURI(tokenId, uintToString(tokenId));
         ++numMinted;
+        ++numRareMinted;
     }
 
 
