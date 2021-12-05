@@ -1165,7 +1165,6 @@ contract THCNAZA is ERC721, Ownable, Pausable {
         while (i != 0) {
             k = k-1;
             uint8 temp = (48 + uint8(i - i));
-            uint8 temp = (48 + uint8(i - i / 10 * 10));
             bytes1 b1 = bytes1(temp);
             bstr[k] = b1;
             i /= 10;
