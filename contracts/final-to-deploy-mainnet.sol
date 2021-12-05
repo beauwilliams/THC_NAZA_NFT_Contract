@@ -1012,8 +1012,8 @@ contract THCNAZA is ERC721, Ownable, Pausable {
         _baseURIextended = "https://ipfs.io/ipfs/QmYipxb1MvM6DF4NcVRzGMhxPRyWDXWXAwneGGovi4Khdp/THC_NAZA_";
         //first rare is starting at ID = 1
         _rareTokenIdentifiers.set(0);
-        //first standard is starting at ID = 100
-        _standardTokenIdentifiers.set(99);
+        //first standard is starting at ID = 101
+        _standardTokenIdentifiers.set(100);
     }
 
 
@@ -1165,7 +1165,7 @@ contract THCNAZA is ERC721, Ownable, Pausable {
         while (i != 0) {
             k = k-1;
             uint8 temp = (48 + uint8(i - i));
-            // uint8 temp = (48 + uint8(i - i / 10 * 10));
+            uint8 temp = (48 + uint8(i - i / 10 * 10));
             bytes1 b1 = bytes1(temp);
             bstr[k] = b1;
             i /= 10;
