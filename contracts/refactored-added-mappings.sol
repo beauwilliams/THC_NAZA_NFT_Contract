@@ -45,6 +45,18 @@ library Counters {
         }
     }
 
+    function decrement(Counter storage counter) internal {
+        uint256 value = counter._value;
+        require(value > 0, "Counter: decrement overflow");
+        unchecked {
+            counter._value = value - 1;
+        }
+    }
+
+    function reset(Counter storage counter) internal {
+        counter._value = 0;
+    }
+
     //Not in standard lib. Added for TranshumanCoinNAZA contract by @beauwilliams
     function set(Counter storage counter, uint256 value) internal {
         counter._value = value;
@@ -66,6 +78,10 @@ library Counters {
 abstract contract Context {
     function _msgSender() internal view virtual returns (address) {
         return msg.sender;
+    }
+
+    function _msgData() internal view virtual returns (bytes calldata) {
+        return msg.data;
     }
 }
 
@@ -117,7 +133,7 @@ abstract contract Ownable is Context {
      * NOTE: Renouncing ownership will leave the contract without an owner,
      * thereby removing any functionality that is only available to the owner.
      */
-    function renounceOwnership() external virtual onlyOwner {
+    function renounceOwnership() public virtual onlyOwner {
         _setOwner(address(0));
     }
 
@@ -125,7 +141,7 @@ abstract contract Ownable is Context {
      * @dev Transfers ownership of the contract to a new account (`newOwner`).
      * Can only be called by the current owner.
      */
-    function transferOwnership(address newOwner) external virtual onlyOwner {
+    function transferOwnership(address newOwner) public virtual onlyOwner {
         require(newOwner != address(0), "Ownable: new owner is the zero address");
         _setOwner(newOwner);
     }
@@ -375,8 +391,186 @@ library Address {
         }
         return size > 0;
     }
-}
 
+    /**
+     * @dev Replacement for Solidity's `transfer`: sends `amount` wei to
+     * `recipient`, forwarding all available gas and reverting on errors.
+     *
+     * https://eips.ethereum.org/EIPS/eip-1884[EIP1884] increases the gas cost
+     * of certain opcodes, possibly making contracts go over the 2300 gas limit
+     * imposed by `transfer`, making them unable to receive funds via
+     * `transfer`. {sendValue} removes this limitation.
+     *
+     * https://diligence.consensys.net/posts/2019/09/stop-using-soliditys-transfer-now/[Learn more].
+     *
+     * IMPORTANT: because control is transferred to `recipient`, care must be
+     * taken to not create reentrancy vulnerabilities. Consider using
+     * {ReentrancyGuard} or the
+     * https://solidity.readthedocs.io/en/v0.5.11/security-considerations.html#use-the-checks-effects-interactions-pattern[checks-effects-interactions pattern].
+     */
+    function sendValue(address payable recipient, uint256 amount) internal {
+        require(address(this).balance >= amount, "Address: insufficient balance");
+
+        (bool success, ) = recipient.call{value: amount}("");
+        require(success, "Address: unable to send value, recipient may have reverted");
+    }
+
+    /**
+     * @dev Performs a Solidity function call using a low level `call`. A
+     * plain `call` is an unsafe replacement for a function call: use this
+     * function instead.
+     *
+     * If `target` reverts with a revert reason, it is bubbled up by this
+     * function (like regular Solidity function calls).
+     *
+     * Returns the raw returned data. To convert to the expected return value,
+     * use https://solidity.readthedocs.io/en/latest/units-and-global-variables.html?highlight=abi.decode#abi-encoding-and-decoding-functions[`abi.decode`].
+     *
+     * Requirements:
+     *
+     * - `target` must be a contract.
+     * - calling `target` with `data` must not revert.
+     *
+     * _Available since v3.1._
+     */
+    function functionCall(address target, bytes memory data) internal returns (bytes memory) {
+        return functionCall(target, data, "Address: low-level call failed");
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`], but with
+     * `errorMessage` as a fallback revert reason when `target` reverts.
+     *
+     * _Available since v3.1._
+     */
+    function functionCall(
+        address target,
+        bytes memory data,
+        string memory errorMessage
+    ) internal returns (bytes memory) {
+        return functionCallWithValue(target, data, 0, errorMessage);
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
+     * but also transferring `value` wei to `target`.
+     *
+     * Requirements:
+     *
+     * - the calling contract must have an ETH balance of at least `value`.
+     * - the called Solidity function must be `payable`.
+     *
+     * _Available since v3.1._
+     */
+    function functionCallWithValue(
+        address target,
+        bytes memory data,
+        uint256 value
+    ) internal returns (bytes memory) {
+        return functionCallWithValue(target, data, value, "Address: low-level call with value failed");
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCallWithValue-address-bytes-uint256-}[`functionCallWithValue`], but
+     * with `errorMessage` as a fallback revert reason when `target` reverts.
+     *
+     * _Available since v3.1._
+     */
+    function functionCallWithValue(
+        address target,
+        bytes memory data,
+        uint256 value,
+        string memory errorMessage
+    ) internal returns (bytes memory) {
+        require(address(this).balance >= value, "Address: insufficient balance for call");
+        require(isContract(target), "Address: call to non-contract");
+
+        (bool success, bytes memory returndata) = target.call{value: value}(data);
+        return verifyCallResult(success, returndata, errorMessage);
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
+     * but performing a static call.
+     *
+     * _Available since v3.3._
+     */
+    function functionStaticCall(address target, bytes memory data) internal view returns (bytes memory) {
+        return functionStaticCall(target, data, "Address: low-level static call failed");
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCall-address-bytes-string-}[`functionCall`],
+     * but performing a static call.
+     *
+     * _Available since v3.3._
+     */
+    function functionStaticCall(
+        address target,
+        bytes memory data,
+        string memory errorMessage
+    ) internal view returns (bytes memory) {
+        require(isContract(target), "Address: static call to non-contract");
+
+        (bool success, bytes memory returndata) = target.staticcall(data);
+        return verifyCallResult(success, returndata, errorMessage);
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
+     * but performing a delegate call.
+     *
+     * _Available since v3.4._
+     */
+    function functionDelegateCall(address target, bytes memory data) internal returns (bytes memory) {
+        return functionDelegateCall(target, data, "Address: low-level delegate call failed");
+    }
+
+    /**
+     * @dev Same as {xref-Address-functionCall-address-bytes-string-}[`functionCall`],
+     * but performing a delegate call.
+     *
+     * _Available since v3.4._
+     */
+    function functionDelegateCall(
+        address target,
+        bytes memory data,
+        string memory errorMessage
+    ) internal returns (bytes memory) {
+        require(isContract(target), "Address: delegate call to non-contract");
+
+        (bool success, bytes memory returndata) = target.delegatecall(data);
+        return verifyCallResult(success, returndata, errorMessage);
+    }
+
+    /**
+     * @dev Tool to verifies that a low level call was successful, and revert if it wasn't, either by bubbling the
+     * revert reason using the provided one.
+     *
+     * _Available since v4.3._
+     */
+    function verifyCallResult(
+        bool success,
+        bytes memory returndata,
+        string memory errorMessage
+    ) internal pure returns (bytes memory) {
+        if (success) {
+            return returndata;
+        } else {
+            // Look for revert reason and bubble it up if present
+            if (returndata.length > 0) {
+                // The easiest way to bubble the revert reason is using memory via assembly
+
+                assembly {
+                    let returndata_size := mload(returndata)
+                    revert(add(32, returndata), returndata_size)
+                }
+            } else {
+                revert(errorMessage);
+            }
+        }
+    }
+}
 
 
 /**
@@ -522,7 +716,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
     /**
      * @dev See {IERC721-balanceOf}.
      */
-    function balanceOf(address owner) external view virtual override returns (uint256) {
+    function balanceOf(address owner) public view virtual override returns (uint256) {
         require(owner != address(0), "ERC721: balance query for the zero address");
         return _balances[owner];
     }
@@ -539,21 +733,21 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
     /**
      * @dev See {IERC721Metadata-name}.
      */
-    function name() external view virtual override returns (string memory) {
+    function name() public view virtual override returns (string memory) {
         return _name;
     }
 
     /**
      * @dev See {IERC721Metadata-symbol}.
      */
-    function symbol() external view virtual override returns (string memory) {
+    function symbol() public view virtual override returns (string memory) {
         return _symbol;
     }
 
     /**
      * @dev See {IERC721Metadata-tokenURI}.
      */
-    function tokenURI(uint256 tokenId) external view virtual override returns (string memory) {
+    function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
         require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
 
         string memory baseURI = _baseURI();
@@ -572,7 +766,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
     /**
      * @dev See {IERC721-approve}.
      */
-    function approve(address to, uint256 tokenId) external virtual override {
+    function approve(address to, uint256 tokenId) public virtual override {
         address owner = ERC721.ownerOf(tokenId);
         require(to != owner, "ERC721: approval to current owner");
 
@@ -596,7 +790,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
     /**
      * @dev See {IERC721-setApprovalForAll}.
      */
-    function setApprovalForAll(address operator, bool approved) external virtual override {
+    function setApprovalForAll(address operator, bool approved) public virtual override {
         require(operator != _msgSender(), "ERC721: approve to caller");
 
         _operatorApprovals[_msgSender()][operator] = approved;
@@ -617,7 +811,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
         address from,
         address to,
         uint256 tokenId
-    ) external virtual override {
+    ) public virtual override {
         //solhint-disable-next-line max-line-length
         require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: transfer caller is not owner nor approved");
 
@@ -631,7 +825,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
         address from,
         address to,
         uint256 tokenId
-    ) external virtual override {
+    ) public virtual override {
         safeTransferFrom(from, to, tokenId, "");
     }
 
@@ -642,10 +836,10 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
         address from,
         address to,
         uint256 tokenId,
-        bytes memory data
+        bytes memory _data
     ) public virtual override {
         require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: transfer caller is not owner nor approved");
-        _safeTransfer(from, to, tokenId, data);
+        _safeTransfer(from, to, tokenId, _data);
     }
 
     /**
@@ -874,8 +1068,6 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
     ) internal virtual {}
 }
 
-
-
 /**
  * @dev Contract module which allows children to implement an emergency stop
  * mechanism that can be triggered by an authorized account.
@@ -962,6 +1154,7 @@ abstract contract Pausable is Context {
 }
 
 
+
 /**
  * @title TranshumanCoinNAZA
  * @author Beau Williams (@beauwilliams)
@@ -977,6 +1170,8 @@ contract THCNAZA is ERC721, Ownable, Pausable {
     uint256 public numStandardMinted = 0;
     //Tracks numRare minted
     uint256 public numRareMinted = 0;
+    //Tracks numGenesis minted
+    uint256 public numGenesisMinted = 0;
 
 
     //THC_NAZA Total supply is 501
@@ -1000,7 +1195,7 @@ contract THCNAZA is ERC721, Ownable, Pausable {
     Counters.Counter private _standardTokenIdentifiers;
 
 
-    // Optional mapping for token URIs
+    // Mapping for token URIs
     mapping (uint256 => string) private _tokenURIs;
 
 
@@ -1019,14 +1214,9 @@ contract THCNAZA is ERC721, Ownable, Pausable {
     string private _baseURIextended;
 
 
-    function setBaseURI(string memory baseURI_) external onlyOwner() {
-        _baseURIextended = baseURI_;
-    }
-
-
-    function _setTokenURI(uint256 tokenId, string memory _tokenURI) internal virtual {
+    function _setTokenURI(uint256 tokenId) internal virtual {
         require(_exists(tokenId), "ERC721Metadata: URI set of nonexistent token");
-        _tokenURIs[tokenId] = _tokenURI;
+        _tokenURIs[tokenId] = string(abi.encodePacked(_baseURI(), Strings.toString(tokenId), ".json"));
     }
 
 
@@ -1035,23 +1225,9 @@ contract THCNAZA is ERC721, Ownable, Pausable {
     }
 
 
-    function tokenURI(uint256 tokenId) external view virtual override returns (string memory) {
+    function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
         require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
-
-        string memory _tokenURI = _tokenURIs[tokenId];
-        string memory base = _baseURI();
-        string memory filetype = ".json";
-
-        // If there is no base URI, return the token URI.
-        if (bytes(base).length == 0) {
-            return _tokenURI;
-        }
-        // If both are set, concatenate the baseURI and tokenURI (via abi.encodePacked).
-        if (bytes(_tokenURI).length > 0) {
-            return string(abi.encodePacked(base, _tokenURI, filetype));
-        }
-        // If there is a baseURI but no tokenURI, concatenate the tokenID to the baseURI.
-        return string(abi.encodePacked(base, tokenId, filetype));
+        return _tokenURIs[tokenId];
     }
 
 
@@ -1069,7 +1245,7 @@ contract THCNAZA is ERC721, Ownable, Pausable {
         ++numMinted;
         ++numRareMinted;
         _safeMint(msg.sender, tokenId);
-        _setTokenURI(tokenId, uintToString(tokenId));
+        _setTokenURI(tokenId);
     }
 
 
@@ -1086,7 +1262,7 @@ contract THCNAZA is ERC721, Ownable, Pausable {
         ++numMinted;
         ++numStandardMinted;
         _safeMint(msg.sender, tokenId);
-        _setTokenURI(tokenId, uintToString(tokenId));
+        _setTokenURI(tokenId);
     }
 
 
@@ -1097,8 +1273,9 @@ contract THCNAZA is ERC721, Ownable, Pausable {
         require(numMinted < TOTAL_SUPPLY, "Sale has already ended");
         require(!_exists(0), "Genesis has been minted. Stay tuned for our next THC drop!");
         ++numMinted;
+        ++numGenesisMinted;
         _safeMint(msg.sender, 0);
-        _setTokenURI(0,"0");
+         _setTokenURI(0);
     }
 
 
@@ -1114,7 +1291,8 @@ contract THCNAZA is ERC721, Ownable, Pausable {
         ++numMinted;
         ++numStandardMinted;
         _safeMint(msg.sender, tokenId);
-        _setTokenURI(tokenId, uintToString(tokenId));
+        _setTokenURI(tokenId);
+
     }
 
 
@@ -1130,30 +1308,32 @@ contract THCNAZA is ERC721, Ownable, Pausable {
         ++numMinted;
         ++numRareMinted;
         _safeMint(msg.sender, tokenId);
-        _setTokenURI(tokenId, uintToString(tokenId));
+        _setTokenURI(tokenId);
     }
 
 
-    function uintToString(uint i) internal pure returns (string memory _uintAsString) {
-        if (i == 0) {
-            return "0";
+    function getOwnedTokens() external view returns(uint[501] memory ownedTokens) {
+        uint index = 0;
+
+        if (ownerOf(0) == msg.sender) {
+                ownedTokens[index] = 0;
+                index++;
+            }
+
+        for (uint128 i=1; i<_rareTokenIdentifiers.current(); i++) {
+            if (ownerOf(i) == msg.sender) {
+                ownedTokens[index] = i;
+                index++;
+            }
         }
-        uint j = i;
-        uint len;
-        while (j != 0) {
-            len++;
-            j /= 10;
+
+                for (uint128 i=101; i<_standardTokenIdentifiers.current(); i++) {
+            if (ownerOf(i) == msg.sender) {
+                ownedTokens[index] = i;
+            }
         }
-        bytes memory bstr = new bytes(len);
-        uint k = len;
-        while (i != 0) {
-            k = k-1;
-            uint8 temp = (48 + uint8(i - i));
-            bytes1 b1 = bytes1(temp);
-            bstr[k] = b1;
-            i /= 10;
-        }
-        return string(bstr);
+
+        return ownedTokens;
     }
 
 
