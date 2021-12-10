@@ -1,2 +1,12 @@
+Metadata of "thcnaza" was published successfully.
+
+contracts/final-contract.sol :
+
+ipfs://QmQC8j5WQGz8XEfhhvzR9D4tNNiacjmgTnvzPCpWb8UkC9
+
+metadata.json :
+
+ipfs://QmdTSm9KehcBDitgJ6uaqkg2Bq6GLAUz1u3Tf9pnTPgPya
+
 https://ipfs.io/qmdtsm9kehcbditgj6uaqkg2bq6glauz1u3tf9pntpgpya/
 
